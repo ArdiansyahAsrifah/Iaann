@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - Dual Mode</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(0, 255, 255, 0.5);
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); }
+            100% { transform: translateY(-100vh) rotate(360deg); }
+        }
+
+        /* Mode Toggle */
+        .mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .mode-btn {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            color: #ffffff;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        /* Header */
+        .header {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+            margin-bottom: 20px;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.5)); }
+            to { filter: drop-shadow(0 0 30px rgba(255, 0, 255, 0.8)); }
+        }
+
+        .hero-content p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+
+        .cta-btn {
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 255, 255, 0.3);
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-item:hover {
+            background: rgba(0, 255, 255, 0.3);
+            transform: scale(1.2);
+        }
+
+        /* Sections */
+        .section {
+            min-height: 100vh;
+            padding: 100px 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 50px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 255, 255, 0.2);
+        }
+
+        .card h3 {
+            color: #00ffff;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .card p {
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(to bottom, #00ffff, #ff00ff);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -1px;
+        }
+
+        .timeline-item {
+            padding: 20px 40px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            width: 45%;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .timeline-item:nth-child(odd) {
+            left: 0;
+        }
+
+        .timeline-item:nth-child(even) {
+            left: 55%;
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #00ffff;
+            border-radius: 50%;
+            top: 20px;
+            z-index: 1;
+        }
+
+        .timeline-item:nth-child(odd)::after {
+            right: -10px;
+        }
+
+        .timeline-item:nth-child(even)::after {
+            left: -10px;
+        }
+
+        /* Skills */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .skill-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .skill-bar {
+            background: rgba(255, 255, 255, 0.2);
+            height: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .skill-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff, #ff00ff);
+            border-radius: 5px;
+            animation: fillSkill 2s ease-in-out;
+        }
+
+        @keyframes fillSkill {
+            from { width: 0; }
+        }
+
+        /* Contact Form */
+        .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Mode-specific content */
+        .mode-content {
+            display: none;
+        }
+
+        .mode-content.active {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            
+            .section {
+                padding: 50px 20px;
+            }
+            
+            .timeline-item {
+                width: 100%;
+                left: 0 !important;
+            }
+            
+            .timeline::after {
+                left: 20px;
+            }
+            
+            .timeline-item::after {
+                left: 10px !important;
+            }
+            
+            .nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation" id="bgAnimation"></div>
+    
+    <!-- Mode Toggle -->
+    <div class="mode-toggle">
+        <button class="mode-btn active" onclick="switchMode('it')">IT Mode</button>
+        <button class="mode-btn" onclick="switchMode('marcom')">Marcom & Media</button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <a href="#home" class="nav-item">🏠</a>
+        <a href="#about" class="nav-item">👤</a>
+        <a href="#projects" class="nav-item">💼</a>
+        <a href="#experience" class="nav-item">🚀</a>
+        <a href="#skills" class="nav-item">⚡</a>
+        <a href="#contact" class="nav-item">📧</a>
+    </nav>
+
+    <!-- Header -->
+    <section id="home" class="header">
+        <div class="hero-content">
+            <h1 id="heroTitle">Creative Technologist</h1>
+            <p id="heroSubtitle">Bridging Innovation with Implementation</p>
+            <a href="#about" class="cta-btn">Explore My Journey</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container">
+            <h2 class="section-title">About Me</h2>
+            <div id="aboutContent" class="mode-content active">
+                <!-- IT Mode Content -->
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>🚀 Tech Innovator</h3>
+                        <p>Passionate about cutting-edge technology, developing scalable solutions, and pushing the boundaries of what's possible in the digital realm. Specialized in full-stack development, cloud architecture, and emerging technologies.</p>
+                    </div>
+                    <div class="card">
+                        <h3>💡 Problem Solver</h3>
+                        <p>Expert in analyzing complex technical challenges and delivering elegant, efficient solutions. Focus on clean code, optimal performance, and user-centric design principles.</p>
+                    </div>
+                    <div class="card">
+                        <h3>🌐 Digital Architect</h3>
+                        <p>Building robust digital infrastructures that scale. Experience in microservices, DevOps practices, and modern development methodologies.</p>
+                    </div>
+                </div>
+            </div>
+            <div id="aboutContentMarcom" class="mode-content">
+                <!-- Marcom & Media Content -->
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>🎨 Creative Strategist</h3>
+                        <p>Crafting compelling brand narratives and marketing campaigns that resonate with target audiences. Expertise in digital marketing, content creation, and brand positioning.</p>
+                    </div>
+                    <div class="card">
+                        <h3>📱 Digital Storyteller</h3>
+                        <p>Creating engaging content across multiple platforms, from social media campaigns to multimedia productions. Specialized in visual storytelling and brand communication.</p>
+                    </div>
+                    <div class="card">
+                        <h3>📈 Growth Hacker</h3>
+                        <p>Data-driven marketing approach with focus on ROI optimization, audience engagement, and conversion rate optimization across digital channels.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="section">
+        <div class="container">
+            <h2 class="section-title">Featured Projects</h2>
+            <div id="projectsContent" class="mode-content active">
+                <!-- IT Projects -->
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>🔧 E-Commerce Platform</h3>
+                        <p>Full-stack e-commerce solution built with React, Node.js, and MongoDB. Features real-time inventory management, payment integration, and advanced analytics dashboard.</p>
+                    </div>
+                    <div class="card">
+                        <h3>🤖 AI Chat Application</h3>
+                        <p>Intelligent chatbot application using natural language processing and machine learning. Integrated with multiple messaging platforms and custom CRM system.</p>
+                    </div>
+                    <div class="card">
+                        <h3>☁️ Cloud Migration Project</h3>
+                        <p>Successfully migrated legacy enterprise systems to cloud infrastructure, reducing costs by 40% and improving performance by 60%.</p>
+                    </div>
+                    <div class="card">
+                        <h3>📊 Data Analytics Dashboard</h3>
+                        <p>Real-time business intelligence dashboard with interactive visualizations, automated reporting, and predictive analytics capabilities.</p>
+                    </div>
+                </div>
+            </div>
+            <div id="projectsContentMarcom" class="mode-content">
+                <!-- Marcom & Media Projects -->
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>🎬 Brand Campaign Video</h3>
+                        <p>Multi-platform video campaign that increased brand awareness by 150%. Produced across social media, TV, and digital platforms with cohesive storytelling.</p>
+                    </div>
+                    <div class="card">
+                        <h3>📱 Social Media Strategy</h3>
+                        <p>Comprehensive social media campaign resulting in 300% follower growth and 250% engagement increase across all platforms within 6 months.</p>
+                    </div>
+                    <div class="card">
+                        <h3>🎨 Brand Identity Redesign</h3>
+                        <p>Complete brand transformation including logo, visual identity, and brand guidelines. Resulted in 40% increase in brand recognition and customer preference.</p>
+                    </div>
+                    <div class="card">
+                        <h3>📈 Digital Marketing Campaign</h3>
+                        <p>Integrated digital marketing campaign across multiple channels, achieving 200% ROI and exceeding conversion targets by 75%.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section id="experience" class="section">
+        <div class="container">
+            <h2 class="section-title">Experience</h2>
+            <div id="experienceContent" class="mode-content active">
+                <!-- IT Experience -->
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h3>Senior Full Stack Developer</h3>
+                        <h4>Tech Innovations Inc. (2022 - Present)</h4>
+                        <p>Leading development of enterprise-level applications, mentoring junior developers, and implementing best practices for scalable architecture.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h3>Software Engineer</h3>
+                        <h4>Digital Solutions Corp. (2020 - 2022)</h4>
+                        <p>Developed and maintained web applications using modern frameworks. Collaborated with cross-functional teams to deliver high-quality software solutions.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h3>Junior Developer</h3>
+                        <h4>StartUp Tech (2019 - 2020)</h4>
+                        <p>Started career building responsive websites and mobile applications. Gained experience in agile development methodologies and client communication.</p>
+                    </div>
+                </div>
+            </div>
+            <div id="experienceContentMarcom" class="mode-content">
+                <!-- Marcom & Media Experience -->
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h3>Senior Marketing Manager</h3>
+                        <h4>Creative Agency Ltd. (2022 - Present)</h4>
+                        <p>Leading integrated marketing campaigns for major brands. Managing team of creatives and driving strategic initiatives for client growth.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h3>Digital Marketing Specialist</h3>
+                        <h4>Media Solutions Inc. (2020 - 2022)</h4>
+                        <p>Executed multi-channel digital marketing strategies. Specialized in content creation, social media management, and performance analytics.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h3>Content Creator</h3>
+                        <h4>Brand Studio (2019 - 2020)</h4>
+                        <p>Created engaging content for various brands across different platforms. Developed skills in videography, graphic design, and copywriting.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="section">
+        <div class="container">
+            <h2 class="section-title">Skills & Expertise</h2>
+            <div id="skillsContent" class="mode-content active">
+                <!-- IT Skills -->
+                <div class="skills-grid">
+                    <div class="skill-item">
+                        <h4>JavaScript / TypeScript</h4>
+                        <div class="skill-bar">
+                            <div class="skill-progress" style="width: 95%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <h4>React / Next.js</h4>
+                        <div class="skill-bar">
+                            <div class="skill-progress" style="width: 90%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <h4>Node.js / Express</h4>
+                        <div class="skill-bar">
+                            <div class="skill-progress" style="width: 88%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <h4>Python / AI/ML</h4>
+                        <div class="skill-bar">
+                            <div class="skill-progress" style="width: 85%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <h4>Cloud Computing (AWS/GCP)</h4>
+                        <div class="skill-bar">
+                            <div class="skill-progress" style="width: 82%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <h4>Database Management</h4>
+                        <div class="skill-bar">
+                            <div class="skill-progress" style="width: 80%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="skillsContentMarcom" class="mode-content">
+                <!-- Marcom & Media Skills -->
+                <div class="skills-grid">
+                    <div class="skill-item">
+                        <h4>Digital Marketing Strategy</h4>
+                        <div class="skill-bar">
+                            <div class="skill-progress" style="width: 95%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <h4>Content Creation</h4>
+                        <div class="skill-bar">
+                            <div class="skill-progress" style="width: 92%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <h4>Social Media Management</h4>
+                        <div class="skill-bar">
+                            <div class="skill-progress" style="width: 90%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <h4>Brand Development</h4>
+                        <div class="skill-bar">
+                            <div class="skill-progress" style="width: 88%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <h4>Video Production</h4>
+                        <div class="skill-bar">
+                            <div class="skill-progress" style="width: 85%"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <h4>Analytics & ROI Tracking</h4>
+                        <div class="skill-bar">
+                            <div class="skill-progress" style="width: 87%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="container">
+            <h2 class="section-title">Get In Touch</h2>
+            <div class="contact-form">
+                <form>
+                    <div class="form-group">
+                        <input type="text" placeholder="Your Name" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" placeholder="Your Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" placeholder="Subject" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea rows="6" placeholder="Your Message" required></textarea>
+                    </div>
+                    <button type="submit" class="cta-btn">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Background Animation
+        function createParticles() {
+            const bgAnimation = document.getElementById('bgAnimation');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                bgAnimation.appendChild(particle);
+            }
+        }
+
+        // Mode Switching
+        function switchMode(mode) {
+            const buttons = document.querySelectorAll('.mode-btn');
+            const itContent = document.querySelectorAll('#aboutContent, #projectsContent, #experienceContent, #skillsContent');
+            const marcomContent = document.querySelectorAll('#aboutContentMarcom, #projectsContentMarcom, #experienceContentMarcom, #skillsContentMarcom');
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            if (mode === 'it') {
+                buttons[0].classList.add('active');
+                document.getElementById('heroTitle').textContent = 'Creative Technologist';
+                document.getElementById('heroSubtitle').textContent = 'Bridging Innovation with Implementation';
+                
+                itContent.forEach(content => content.classList.add('active'));
+                marcomContent.forEach(content => content.classList.remove('active'));
+            } else {
+                buttons[1].classList.add('active');
+                document.getElementById('heroTitle').textContent = 'Creative Strategist';
+                document.getElementById('heroSubtitle').textContent = 'Crafting Stories, Building Brands';
+                
+                marcomContent.forEach(content => content.classList.add('active'));
+                itContent.forEach(content => content.classList.remove('active'));
+            }
+        }
+
+        // Smooth Scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Form Submission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Terima kasih! Pesan Anda telah dikirim.');
+            this.reset();
+        });
+
+        // Initialize
+        createParticles();
+
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.card, .timeline-item, .skill-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(50px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
